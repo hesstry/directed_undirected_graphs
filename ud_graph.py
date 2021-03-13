@@ -185,14 +185,13 @@ class UndirectedGraph:
         if path_size == 0:
             return True
 
-        # if single length, quick check
-        if path[0] in self.adj_list and path_size == 1:
-            return True
-
         is_path = True
         path_ind = 0
         while is_path and path_ind < path_size:
             curr_vertex = path[path_ind]
+            # if vertex not in graph, not a possible path!
+            if curr_vertex not in self.adj_list:
+                return False
             if path_ind + 1 < path_size:
                 next_vertex = path[path_ind+1]
             # at this point if we are on the last vertex then we have found a path here from vertex 1
