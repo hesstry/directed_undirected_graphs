@@ -139,7 +139,7 @@ class UndirectedGraph:
             gathers all vertices from graph in no particular order
         """
 
-        return self.adj_list.keys()
+        return list(self.adj_list.keys())
 
     def get_edges(self) -> []:
         """
