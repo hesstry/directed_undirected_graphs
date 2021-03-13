@@ -127,6 +127,9 @@ class UndirectedGraph:
             # remove v from each of v's neighbor's neighbor-list
             self.adj_list[neighbor].remove(v)
 
+        # finally remove the vertex from the dictionary of vertices
+        self.adj_list.pop(v, None)
+
     def get_vertices(self) -> []:
         """
         parameters:
