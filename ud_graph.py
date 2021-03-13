@@ -188,8 +188,6 @@ class UndirectedGraph:
         # if single length, quick check
         if path[0] in self.adj_list and path_size == 1:
             return True
-        else:
-            return False
 
         is_path = True
         path_ind = 0
