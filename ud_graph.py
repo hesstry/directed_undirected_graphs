@@ -65,8 +65,11 @@ class UndirectedGraph:
             none
 
         functionality:
-            ensures that by the end of execution, both vertices exist, and are connected by an edge
+            ensures that by the end of execution, both vertices exist, and are connected by an edge unless
+            vertices are the same
         """
+        if u == v:
+            return
 
         if u not in self.adj_list:
             self.add_vertex(u)
