@@ -393,6 +393,7 @@ class DirectedGraph:
 
                     # this is where we check for sink/source node needed for a cycle to exist
                     elif history[curr_vertex] == 'black':
+                        print("RETURNING TO BLACK VERTEX: ", curr_vertex)
                         return True
 
                 print("VISITED: ", visited_stack)
