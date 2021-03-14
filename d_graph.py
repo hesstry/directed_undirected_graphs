@@ -218,7 +218,7 @@ class DirectedGraph:
             a list containing vertices visited and in the order they were visited
 
         functionality:
-            Performs a breadth first search on the graph and returns the connected component
+            Performs a depth first search on the graph and returns the connected component
             built from this search, with order being visit-sequence first to last
         """
 
@@ -244,7 +244,10 @@ class DirectedGraph:
                         self.push(col_ind, curr_vertex_neighbors)
 
                     col_ind += 1
-                # now add all of these to the stack, sort them in ascending order
+                # now add all of these to the stack, sort them in descending order
+                # descending order allows for correct processing of to_visit vertices
+                # since the lowest values will be pushed last while the higher values
+                # will be pushed first
                 curr_vertex_neighbors = sorted(curr_vertex_neighbors, reverse=True)
                 for neighbor in curr_vertex_neighbors:
                     self.push(neighbor, to_visit_stack)
@@ -253,20 +256,69 @@ class DirectedGraph:
         return visited_stack
 
     def push(self, element, array):
+        """
+        Mainly to allow for more direct meaning when dealing with stack/queue
+        """
         array.append(element)
+
+    def enqueue(self, element, array):
+        """
+        Mainly to allow for more direct meaning when dealing with stack/queue
+        """
+        array.append(element)
+
+    def dequeue(self, array):
+        """
+        Mainly to allow for more direct meaning when dealing with stack/queue
+        """
+        return array.pop(0)
 
     def bfs(self, v_start, v_end=None) -> []:
         """
         parameters:
-
+            v_start(int): vertex to start the depth first search on
+            v_end(int) OPTIONAL: optional vertex to end the search on
 
         returns:
-
+            a list containing vertices visited and in the order they were visited
 
         functionality:
-
+            Performs a breadth first search on the graph and returns the connected component
+            built from this search, with order being visit-sequence first-to-last
         """
-        pass
+        to_visit_queue = []
+        visited_stack = []
+
+        self.enqueue(v_start, to_visit_queue)
+        to_visit_queue_len = 1
+
+        while to_visit_queue_len > 0:
+            curr_vertex = self.dequeue(to_visit_queue)
+            to_visit_queue_len -= 1
+
+            # only process non-visited vertices
+            if curr_vertex not in visited_stack:
+                self.push(curr_vertex, visited_stack)
+
+                curr_vertex_neighbors = []
+                col_ind = 0
+                # find all vertices that curr_vertex is connected to
+                while col_ind < self.v_count:
+                    # process edge existence for each vertex
+                    if self.adj_matrix[curr_vertex][col_ind] > 0:
+                        self.enqueue(col_ind, curr_vertex_neighbors)
+
+                    col_ind += 1
+                # now add all of these to the stack, sort them in ascending order
+                # ascending order is good as dequeue will process elements in the
+                # order they were placed inside the to_visit_queue
+                curr_vertex_neighbors = sorted(curr_vertex_neighbors)
+                for neighbor in curr_vertex_neighbors:
+                    self.enqueue(neighbor, to_visit_queue)
+                    to_visit_queue_len += 1
+
+        return visited_stack
+
 
     def has_cycle(self):
         """
