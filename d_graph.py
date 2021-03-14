@@ -357,19 +357,23 @@ class DirectedGraph:
 
             if vertex not in accounted_for:
 
-                to_visit_queue = []
+                to_visit_stack = [vertex]
+                to_visit_stack_len = 1
                 visited_stack = []
 
-                self.enqueue(vertex, to_visit_queue)
-                to_visit_queue_len = 1
+                current_trail = []
 
-                while to_visit_queue_len > 0:
-                    print("TO VISIT QUEUE: ", to_visit_queue)
-                    curr_vertex = self.dequeue(to_visit_queue)
+                while to_visit_stack_len > 0:
+                    print("TO VISIT STACK: ", to_visit_stack)
+                    curr_vertex = to_visit_stack.pop()
+                    current_trail.append(curr_vertex)
                     if curr_vertex not in history:
-                        history[curr_vertex] = 'gray'
-                    to_visit_queue_len -= 1
+                        history[curr_vertex] = "gray"
 
+                    if curr_vertex not in accounted_for:
+                        accounted_for[curr_vertex] = True
+
+                    to_visit_stack_len -= 1
                     # only process non-visited vertices
                     if curr_vertex not in visited_stack:
                         self.push(curr_vertex, visited_stack)
@@ -380,22 +384,31 @@ class DirectedGraph:
                         while col_ind < self.v_count:
                             # process edge existence for each vertex
                             if self.adj_matrix[curr_vertex][col_ind] > 0:
-                                self.enqueue(col_ind, curr_vertex_neighbors)
+                                self.push(col_ind, curr_vertex_neighbors)
 
                             col_ind += 1
-                        # now add all of these to the stack, sort them in ascending order
-                        # ascending order is good as dequeue will process elements in the
-                        # order they were placed inside the to_visit_queue
-                        curr_vertex_neighbors = sorted(curr_vertex_neighbors)
+                        # now add all of these to the stack, sort them in descending order
+                        # descending order allows for correct processing of to_visit vertices
+                        # since the lowest values will be pushed last while the higher values
+                        # will be pushed first
+                        curr_vertex_neighbors = sorted(curr_vertex_neighbors, reverse=True)
+
+                        if not curr_vertex_neighbors:
+                            current_trail.pop()
+
                         for neighbor in curr_vertex_neighbors:
-                            self.enqueue(neighbor, to_visit_queue)
-                            to_visit_queue_len += 1
+                            # this only runs if the vertex is not a "leaf node"
                             history[curr_vertex] = 'black'
 
+                            self.push(neighbor, to_visit_stack)
+                            to_visit_stack_len += 1
+
                     # this is where we check for sink/source node needed for a cycle to exist
-                    elif history[curr_vertex] == 'black':
-                        print("RETURNING TO BLACK VERTEX: ", curr_vertex)
-                        print("VISITED: ", visited_stack)
+                    # elif history[curr_vertex] == 'black':
+                    #     return True
+
+                    elif curr_vertex in current_trail and history[curr_vertex] == 'black':
+                        print("FOUND A CYCLE: ", current_trail)
                         print("HISTORY: ", history)
                         return True
 
