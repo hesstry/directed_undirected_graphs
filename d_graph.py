@@ -362,6 +362,7 @@ class DirectedGraph:
                 visited_stack = []
 
                 while to_visit_stack_len > 0:
+                    print("TO VISIT STACK: ", to_visit_stack)
                     curr_vertex = to_visit_stack.pop()
                     if curr_vertex not in history:
                         history[curr_vertex] = "gray"
