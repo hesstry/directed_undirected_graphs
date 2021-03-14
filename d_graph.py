@@ -59,61 +59,111 @@ class DirectedGraph:
             int
 
         functionality:
-            Adds vertex to tree with no edges connected to it
+            Adds vertex to tree and returns new number of vertices
         """
 
+        new_vertex = []
+
+        # initialize new vertex with as many zeroes equal to current v_count
+        for column in range(self.v_count):
+            new_vertex.append(0)
+
+        # append to matrix
+        self.adj_matrix.append(new_vertex)
+
+        # now account for newly added vertex and append one more column to each
+        for vertex_row in self.adj_matrix:
+            vertex_row.append(0)
+
+        self.v_count += 1
 
     def add_edge(self, src: int, dst: int, weight=1) -> None:
         """
         parameters:
-
+            src(int): source vertex
+            dst(int): destination vertex
+            weight(int): weight of each edge
 
         returns:
-
+            none
 
         functionality:
+            Adds edge from source to destination vertex with specified weight or 1
 
+            This method adds a new edge to the graph, connecting two vertices with provided indices. If either
+            (or both) vertex indices do not exist in the graph, or if the weight is not a positive integer,
+            or if src and dst refer to the same vertex, the method does nothing. If an edge already
+            exists in the graph, the method will update its weight.
         """
-        pass
+
+        if src == dst:
+            return
+
+        if src >= self.v_count or src < 0 or dst >= self.v_count or dst < 0:
+            return
+
+        if weight <= 0:
+            return
+
+        self.adj_matrix[src][dst] = weight
+
 
     def remove_edge(self, src: int, dst: int) -> None:
         """
         parameters:
-
+            src(int): source vertex
+            dst(int): destination vertex
 
         returns:
-
+            none
 
         functionality:
-
+            Removes specified edge if it exists
         """
-        pass
+        if src == dst:
+            return
+
+        if src >= self.v_count or src < 0 or dst >= self.v_count or dst < 0:
+            return
+
+        self.adj_matrix[src][dst] = 0
+
 
     def get_vertices(self) -> []:
         """
         parameters:
-
+            none
 
         returns:
-
+            list of vertices in no particular order
 
         functionality:
-
+            returns a list of vertices in the graph
         """
-        pass
+
+        return [x for x in range(self.v_count)]
+
 
     def get_edges(self) -> []:
         """
         parameters:
-
+            none
 
         returns:
-
+            list of all edges in the graph
 
         functionality:
-
+            returns a list of all edges in the graph
         """
-        pass
+        edges = []
+
+        for row_vertex in range(self.v_count):
+            for col_vertex in range(self.v_count):
+                # if weight is more than 0
+                if self.adj_matrix[row_vertex][col_vertex] > 0:
+                    edges.append((row_vertex, col_vertex, self.adj_matrix[row_vertex][col_vertex]))
+
+        return edges
 
     def is_valid_path(self, path: []) -> bool:
         """
