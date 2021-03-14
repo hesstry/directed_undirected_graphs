@@ -400,7 +400,7 @@ class DirectedGraph:
                     elif history[curr_vertex] == 'black':
                         return True
 
-                print("VISITED: ", history)
+                print("VISITED: ", visited_stack)
 
         return False
 
