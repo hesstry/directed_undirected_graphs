@@ -170,15 +170,36 @@ class DirectedGraph:
     def is_valid_path(self, path: []) -> bool:
         """
         parameters:
-
+            path(Python built-in list): specified path
 
         returns:
-
+            boolean value describing whether or not the specified path exists in the graph
 
         functionality:
-
+            uses the specified path to verify with the adj_matrix and returns True/False
+            based on whether or not the algo successfully iterated through the path
         """
-        pass
+
+        path_len = len(path)
+        path_ind = 1
+
+        if path_len == 1:
+            if path[0] >= self.v_count or path[0] < 0:
+                return False
+
+        while path_len > 1:
+            next_vertex = path[path_ind]
+            curr_vertex = path[path_ind-1]
+
+            if next_vertex < 0 or next_vertex >= self.v_count or curr_vertex < 0 or curr_vertex >= self.v_count:
+                return False
+
+            if self.adj_matrix[curr_vertex][next_vertex] == 0:
+                return False
+
+            path_len -= 1
+
+        return True
 
     def dfs(self, v_start, v_end=None) -> []:
         """
