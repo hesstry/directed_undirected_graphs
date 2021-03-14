@@ -187,34 +187,73 @@ class DirectedGraph:
             if path[0] >= self.v_count or path[0] < 0:
                 return False
 
+        # starting on second element we compare first-next vertices to determine
+        # whether a non-zero edge exists from first to next
         while path_len > 1:
 
             next_vertex = path[path_ind]
             curr_vertex = path[path_ind-1]
 
+            # check boundaries of proper vertices
             if next_vertex < 0 or next_vertex >= self.v_count or curr_vertex < 0 or curr_vertex >= self.v_count:
                 return False
 
+            # if no edge exists between first and next vertex
             if self.adj_matrix[curr_vertex][next_vertex] == 0:
                 return False
 
             path_ind += 1
             path_len -= 1
 
+        # if path successfully completed
         return True
 
     def dfs(self, v_start, v_end=None) -> []:
         """
         parameters:
-
+            v_start(int): vertex to start the depth first search on
+            v_end(int) OPTIONAL: optional vertex to end the search on
 
         returns:
-
+            a list containing vertices visited and in the order they were visited
 
         functionality:
-
+            Performs a breadth first search on the graph and returns the connected component
+            built from this search, with order being visit-sequence first to last
         """
-        pass
+
+        to_visit_stack = []
+        visited_stack = []
+
+        self.push(v_start, to_visit_stack)
+        to_visit_stack_len = 1
+
+        while to_visit_stack_len > 0:
+            curr_vertex = to_visit_stack.pop()
+            to_visit_stack_len -= 1
+            # only process non-visited vertices
+            if curr_vertex not in visited_stack:
+                self.push(curr_vertex, visited_stack)
+
+                curr_vertex_neighbors = []
+                col_ind = 0
+                # find all vertices that curr_vertex is connected to
+                while col_ind < self.v_count:
+                    # process edge existence for each vertex
+                    if self.adj_matrix[curr_vertex][col_ind] > 0:
+                        self.push(col_ind, curr_vertex_neighbors)
+
+                    col_ind += 1
+                # now add all of these to the stack, sort them in ascending order
+                curr_vertex_neighbors = sorted(curr_vertex_neighbors, reverse=True)
+                for neighbor in curr_vertex_neighbors:
+                    self.push(neighbor, to_visit_stack)
+                    to_visit_stack_len += 1
+
+        return visited_stack
+
+    def push(self, element, array):
+        array.append(element)
 
     def bfs(self, v_start, v_end=None) -> []:
         """
