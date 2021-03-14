@@ -401,6 +401,7 @@ class DirectedGraph:
                         return True
 
                 print("VISITED: ", visited_stack)
+                print("HISTORY: ", history)
 
         return False
 
