@@ -188,6 +188,7 @@ class DirectedGraph:
                 return False
 
         while path_len > 1:
+
             next_vertex = path[path_ind]
             curr_vertex = path[path_ind-1]
 
@@ -286,7 +287,7 @@ if __name__ == '__main__':
     edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
              (3, 1, 5), (2, 1, 23), (3, 2, 7)]
     g = DirectedGraph(edges)
-    test_cases = [[0, 1, 4, 3], [1, 3, 2, 1], [0, 4], [4, 0], [], [2]]
+    test_cases = [[0, 4, 7, 8, 5, 1, 2, 9, 10], [1, 3, 2, 1], [0, 4], [4, 0], [], [2]]
     for path in test_cases:
         print(path, g.is_valid_path(path))
 
