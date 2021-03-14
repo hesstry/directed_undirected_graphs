@@ -364,6 +364,7 @@ class DirectedGraph:
                 to_visit_queue_len = 1
 
                 while to_visit_queue_len > 0:
+                    print("TO VISIT QUEUE: ", to_visit_queue)
                     curr_vertex = self.dequeue(to_visit_queue)
                     if curr_vertex not in history:
                         history[curr_vertex] = 'gray'
