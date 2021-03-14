@@ -198,6 +198,7 @@ class DirectedGraph:
             if self.adj_matrix[curr_vertex][next_vertex] == 0:
                 return False
 
+            path_ind += 1
             path_len -= 1
 
         return True
@@ -284,8 +285,10 @@ if __name__ == '__main__':
 
     print("\nPDF - method is_valid_path() example 1")
     print("--------------------------------------")
-    edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
-             (3, 1, 5), (2, 1, 23), (3, 2, 7)]
+    edges = [(0, 4, 2), (1, 0, 10), (1, 2, 10), (2, 6, 6),
+             (2, 9, 7), (3, 2, 6), (3, 10, 4), (4, 7, 4),
+             (5, 1, 4), (5, 9, 5), (6, 3, 1), (7, 8, 1),
+             (8, 5, 7), (9, 0, 2), (10, 9, 3)]
     g = DirectedGraph(edges)
     test_cases = [[0, 4, 7, 8, 5, 1, 2, 9, 10], [1, 3, 2, 1], [0, 4], [4, 0], [], [2]]
     for path in test_cases:
