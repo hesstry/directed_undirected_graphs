@@ -77,6 +77,8 @@ class DirectedGraph:
 
         self.v_count += 1
 
+        return self.v_count
+
     def add_edge(self, src: int, dst: int, weight=1) -> None:
         """
         parameters:
