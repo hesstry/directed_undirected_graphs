@@ -474,8 +474,7 @@ class DirectedGraph:
                     # if this new path to this neighbor is shorter
                     elif distances[(src, curr_vertex)] + distances[(curr_vertex, neighbor)] < distances[
                         (src, neighbor)]:
-                        distances[(src, neighbor)] = distances[(src, curr_vertex)] + distances[
-                            (curr_vertex, neighbor)]
+                        distances[(src, neighbor)] = distances[(src, curr_vertex)] + self.adj_matrix[curr_vertex][neighbor]
 
                     print("CURRENT SHORTEST PATH FROM {} TO {}: ".format(src, neighbor), distances[(src, neighbor)])
 
