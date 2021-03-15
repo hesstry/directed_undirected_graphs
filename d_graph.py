@@ -396,7 +396,6 @@ class DirectedGraph:
 
         return False
 
-
     def dijkstra(self, src: int) -> []:
         """
         parameters:
@@ -419,15 +418,20 @@ class DirectedGraph:
 
         distances[(src, src)] = 0
 
-        to_visit_stack = []
+        to_visit_queue = []
         visited_stack = []
 
-        self.push(src, to_visit_stack)
-        to_visit_stack_len = 1
+        self.enqueue(src, to_visit_queue)
+        to_visit_queue_len = 1
 
-        while to_visit_stack_len > 0:
-            curr_vertex = to_visit_stack.pop()
-            to_visit_stack_len -= 1
+        while to_visit_queue_len > 0:
+            curr_vertex = self.dequeue(to_visit_queue)
+
+            if src not in children:
+                children[src] = []
+
+            to_visit_queue_len -= 1
+
             # only process non-visited vertices
             if curr_vertex not in visited_stack:
                 self.push(curr_vertex, visited_stack)
@@ -438,17 +442,16 @@ class DirectedGraph:
                 while col_ind < self.v_count:
                     # process edge existence for each vertex
                     if self.adj_matrix[curr_vertex][col_ind] > 0:
-                        self.push(col_ind, curr_vertex_neighbors)
+                        self.enqueue(col_ind, curr_vertex_neighbors)
 
                     col_ind += 1
-                # now add all of these to the stack, sort them in descending order
-                # descending order allows for correct processing of to_visit vertices
-                # since the lowest values will be pushed last while the higher values
-                # will be pushed first
-                curr_vertex_neighbors = sorted(curr_vertex_neighbors, reverse=True)
+                # now add all of these to the stack, sort them in ascending order
+                # ascending order is good as dequeue will process elements in the
+                # order they were placed inside the to_visit_queue
+                curr_vertex_neighbors = sorted(curr_vertex_neighbors)
                 for neighbor in curr_vertex_neighbors:
-                    self.push(neighbor, to_visit_stack)
-                    to_visit_stack_len += 1
+                    if neighbor not in children[src]:
+                        children[src].append(neighbor)
 
                     # if a path from src to neighbor exists, and a path from neighbor to some other vertex exists,
                     # then a path from src to that other vertex exists, and we can do
@@ -462,18 +465,24 @@ class DirectedGraph:
 
                     # if a path to this neighbor has not been accounted for yet
                     if (src, neighbor) not in distances:
-                        distances[(src, neighbor)] = distances[(src, curr_vertex)] + distances[(curr_vertex, neighbor)]
+                        distances[(src, neighbor)] = distances[(src, curr_vertex)] + distances[
+                            (curr_vertex, neighbor)]
 
                     # this runs when a path to the current neighbor is already in the books, and we now check to see
                     # if this new path to this neighbor is shorter
-                    elif distances[(src, curr_vertex)] + distances[(curr_vertex, neighbor)] < distances[(src, neighbor)]:
+                    elif distances[(src, curr_vertex)] + distances[(curr_vertex, neighbor)] < distances[
+                        (src, neighbor)]:
                         print("FOUND A SHORTER PATH OLD LENGTH: ", distances[(src, neighbor)])
-                        distances[(src, neighbor)] = distances[(src, curr_vertex)] + distances[(curr_vertex, neighbor)]
+                        distances[(src, neighbor)] = distances[(src, curr_vertex)] + distances[
+                            (curr_vertex, neighbor)]
                         print("FOUND A SHORTER PATH NEW LENGTH: ", distances[(src, neighbor)])
+
+                    self.enqueue(neighbor, to_visit_queue)
+                    to_visit_queue_len += 1
 
         print(visited_stack)
 
-        calculated_distances = [None]*self.v_count
+        calculated_distances = [None] * self.v_count
 
         path_ind = 0
         while path_ind < self.v_count:
@@ -555,14 +564,20 @@ if __name__ == '__main__':
     # print('\n', g)
     #
     #
-    print("\nPDF - dijkstra() example 1")
+    # print("\nPDF - dijkstra() example 1")
+    # print("--------------------------")
+    # edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
+    #          (3, 1, 5), (2, 1, 23), (3, 2, 7)]
+    # g = DirectedGraph(edges)
+    # for i in range(5):
+    #     print(f'DIJKSTRA {i} {g.dijkstra(i)}')
+    # g.remove_edge(4, 3)
+    # print('\n', g)
+    # for i in range(5):
+    #     print(f'DIJKSTRA {i} {g.dijkstra(i)}')
+
+    print("\nGRADESCOPE DIJKSTRA UGH")
     print("--------------------------")
-    edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
-             (3, 1, 5), (2, 1, 23), (3, 2, 7)]
+    edges = [(0, 3, 8), (0, 11, 13), (1, 0, 19), (1, 3, 20),(2, 0, 10), (2, 1, 13), (2, 5, 2), (2, 10, 7), (3, 7, 18), (5, 3, 12), (7, 0, 15), (11, 10, 17), (12, 3, 3)]
     g = DirectedGraph(edges)
-    for i in range(5):
-        print(f'DIJKSTRA {i} {g.dijkstra(i)}')
-    g.remove_edge(4, 3)
-    print('\n', g)
-    for i in range(5):
-        print(f'DIJKSTRA {i} {g.dijkstra(i)}')
+    print(f'DIJKSTRA {2} {g.dijkstra(2)}')
