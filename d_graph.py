@@ -466,14 +466,14 @@ class DirectedGraph:
                     elif (curr_vertex, neighbor) not in distances:
                         distances[(curr_vertex, neighbor)] = self.adj_matrix[curr_vertex][neighbor]
 
-                    # if a path to this neighbor has not been accounted for yet
-                    if (src, neighbor) not in distances:
-                        distances[(src, neighbor)] = distances[(src, curr_vertex)] + self.adj_matrix[curr_vertex][neighbor]
+                    if (src, curr_vertex) in distances:
+                        curr_path_distance = distances[(src, curr_vertex)] + self.adj_matrix[curr_vertex][neighbor]
 
-                    # this runs when a path to the current neighbor is already in the books, and we now check to see
-                    # if this new path to this neighbor is shorter
-                    if distances[(src, neighbor)] > distances[(src, curr_vertex)] + self.adj_matrix[curr_vertex][neighbor]:
-                        distances[(src, neighbor)] = distances[(src, curr_vertex)] + self.adj_matrix[curr_vertex][neighbor]
+                        if (src, neighbor) in distances:
+                            distances[(src, neighbor)] = min(distances[(src, neighbor)], curr_path_distance)
+
+                        else:
+                            distances[(src, neighbor)] = curr_path_distance
 
                     self.enqueue(neighbor, to_visit_queue)
                     to_visit_queue_len += 1
