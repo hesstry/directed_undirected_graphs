@@ -467,8 +467,7 @@ class DirectedGraph:
 
                     # if a path to this neighbor has not been accounted for yet
                     if (src, neighbor) not in distances:
-                        distances[(src, neighbor)] = distances[(src, curr_vertex)] + distances[
-                            (curr_vertex, neighbor)]
+                        distances[(src, neighbor)] = distances[(src, curr_vertex)] + self.adj_matrix[curr_vertex][neighbor]
 
                     # this runs when a path to the current neighbor is already in the books, and we now check to see
                     # if this new path to this neighbor is shorter
@@ -478,9 +477,6 @@ class DirectedGraph:
 
                     self.enqueue(neighbor, to_visit_queue)
                     to_visit_queue_len += 1
-
-        print(visited_stack)
-        print(distances)
 
         calculated_distances = [None] * self.v_count
 
