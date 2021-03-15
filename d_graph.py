@@ -4,6 +4,7 @@
 # Description:
 
 import heapq
+from collections import OrderedDict
 
 class DirectedGraph:
     """
@@ -416,7 +417,7 @@ class DirectedGraph:
 
         children = {}
 
-        distances = {}
+        distances = OrderedDict()
 
         distances[(src, src)] = 0
 
