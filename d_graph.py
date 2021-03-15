@@ -434,47 +434,47 @@ class DirectedGraph:
             to_visit_queue_len -= 1
 
             # only process non-visited vertices
-            if curr_vertex not in visited_stack:
-                self.push(curr_vertex, visited_stack)
+            self.push(curr_vertex, visited_stack)
 
-                curr_vertex_neighbors = []
-                col_ind = 0
-                # find all vertices that curr_vertex is connected to
-                while col_ind < self.v_count:
-                    # process edge existence for each vertex
-                    if self.adj_matrix[curr_vertex][col_ind] > 0:
-                        self.enqueue(col_ind, curr_vertex_neighbors)
+            curr_vertex_neighbors = []
+            col_ind = 0
+            # find all vertices that curr_vertex is connected to
+            while col_ind < self.v_count:
+                # process edge existence for each vertex
+                if self.adj_matrix[curr_vertex][col_ind] > 0:
+                    self.enqueue(col_ind, curr_vertex_neighbors)
 
-                    col_ind += 1
-                # now add all of these to the stack, sort them in ascending order
-                # ascending order is good as dequeue will process elements in the
-                # order they were placed inside the to_visit_queue
-                curr_vertex_neighbors = sorted(curr_vertex_neighbors)
-                for neighbor in curr_vertex_neighbors:
-                    if neighbor not in children[src]:
-                        children[src].append(neighbor)
+                col_ind += 1
+            # now add all of these to the stack, sort them in ascending order
+            # ascending order is good as dequeue will process elements in the
+            # order they were placed inside the to_visit_queue
+            curr_vertex_neighbors = sorted(curr_vertex_neighbors)
+            for neighbor in curr_vertex_neighbors:
+                if neighbor not in children[src]:
+                    children[src].append(neighbor)
 
-                    # if a path from src to neighbor exists, and a path from neighbor to some other vertex exists,
-                    # then a path from src to that other vertex exists, and we can do
-                    # distance from src to other vertex = distance from src to neighbor + distance from neighbor to other vertex
-                    if curr_vertex == src:
-                        distances[(src, neighbor)] = self.adj_matrix[src][neighbor]
+                # if a path from src to neighbor exists, and a path from neighbor to some other vertex exists,
+                # then a path from src to that other vertex exists, and we can do
+                # distance from src to other vertex = distance from src to neighbor + distance from neighbor to other vertex
+                if curr_vertex == src:
+                    distances[(src, neighbor)] = self.adj_matrix[src][neighbor]
 
-                    # if this is the first time we've encountered this path, go ahead and add it
-                    if curr_vertex != src and (curr_vertex, neighbor) not in distances:
-                        distances[(curr_vertex, neighbor)] = self.adj_matrix[curr_vertex][neighbor]
+                # if this is the first time we've encountered this path, go ahead and add it
+                if curr_vertex != src and (curr_vertex, neighbor) not in distances:
+                    distances[(curr_vertex, neighbor)] = self.adj_matrix[curr_vertex][neighbor]
 
-                    # if a path to this neighbor has not been accounted for yet
-                    if (src, neighbor) not in distances:
-                        distances[(src, neighbor)] = distances[(src, curr_vertex)] + distances[(curr_vertex, neighbor)]
+                # if a path to this neighbor has not been accounted for yet
+                if (src, neighbor) not in distances:
+                    distances[(src, neighbor)] = distances[(src, curr_vertex)] + distances[(curr_vertex, neighbor)]
 
-                    # this runs when a path to the current neighbor is already in the books, and we now check to see
-                    # if this new path to this neighbor is shorter
-                    elif distances[(src, curr_vertex)] + distances[(curr_vertex, neighbor)] < distances[(src, neighbor)]:
-                        print("FOUND A SHORTER PATH OLD LENGTH: ", distances[(src, neighbor)])
-                        distances[(src, neighbor)] = distances[(src, curr_vertex)] + distances[(curr_vertex, neighbor)]
-                        print("FOUND A SHORTER PATH NEW LENGTH: ", distances[(src, neighbor)])
+                # this runs when a path to the current neighbor is already in the books, and we now check to see
+                # if this new path to this neighbor is shorter
+                elif distances[(src, curr_vertex)] + distances[(curr_vertex, neighbor)] < distances[(src, neighbor)]:
+                    print("FOUND A SHORTER PATH OLD LENGTH: ", distances[(src, neighbor)])
+                    distances[(src, neighbor)] = distances[(src, curr_vertex)] + distances[(curr_vertex, neighbor)]
+                    print("FOUND A SHORTER PATH NEW LENGTH: ", distances[(src, neighbor)])
 
+                if neighbor not in visited_stack:
                     self.enqueue(neighbor, to_visit_queue)
                     to_visit_queue_len += 1
 
