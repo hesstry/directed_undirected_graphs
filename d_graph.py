@@ -478,6 +478,8 @@ class DirectedGraph:
                     self.enqueue(neighbor, to_visit_queue)
                     to_visit_queue_len += 1
 
+        print(visited_stack)
+
         calculated_distances = [None]*self.v_count
 
         path_ind = 0
