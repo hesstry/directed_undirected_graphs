@@ -480,10 +480,7 @@ class DirectedGraph:
                 calculated_distances[path_ind] = distances[(src, path_ind)]
             path_ind += 1
 
-        print(calculated_distances)
-        print(self)
-
-
+        return calculated_distances
 
 
 if __name__ == '__main__':
