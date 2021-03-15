@@ -417,7 +417,7 @@ class DirectedGraph:
 
         children = {}
 
-        distances = OrderedDict()
+        distances = {}
 
         distances[(src, src)] = 0
 
