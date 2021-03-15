@@ -3,6 +3,8 @@
 # Assignment:
 # Description:
 
+import heapq
+
 class DirectedGraph:
     """
     Class to implement directed weighted graph
@@ -472,15 +474,16 @@ class DirectedGraph:
                     # if this new path to this neighbor is shorter
                     elif distances[(src, curr_vertex)] + distances[(curr_vertex, neighbor)] < distances[
                         (src, neighbor)]:
-                        print("FOUND A SHORTER PATH OLD LENGTH: ", distances[(src, neighbor)])
                         distances[(src, neighbor)] = distances[(src, curr_vertex)] + distances[
                             (curr_vertex, neighbor)]
-                        print("FOUND A SHORTER PATH NEW LENGTH: ", distances[(src, neighbor)])
+
+                    print("CURRENT SHORTEST PATH FROM {} TO {}: ".format(src, neighbor), distances[(src, neighbor)])
 
                     self.enqueue(neighbor, to_visit_queue)
                     to_visit_queue_len += 1
 
         print(visited_stack)
+        print(distances)
 
         calculated_distances = [None] * self.v_count
 
