@@ -471,7 +471,9 @@ class DirectedGraph:
                     # this runs when a path to the current neighbor is already in the books, and we now check to see
                     # if this new path to this neighbor is shorter
                     elif distances[(src, curr_vertex)] + distances[(curr_vertex, neighbor)] < distances[(src, neighbor)]:
+                        print("FOUND A SHORTER PATH OLD LENGTH: ", distances[(src, neighbor)])
                         distances[(src, neighbor)] = distances[(src, curr_vertex)] + distances[(curr_vertex, neighbor)]
+                        print("FOUND A SHORTER PATH NEW LENGTH: ", distances[(src, neighbor)])
 
                     self.enqueue(neighbor, to_visit_queue)
                     to_visit_queue_len += 1
