@@ -361,14 +361,15 @@ class DirectedGraph:
                 to_visit_stack_len = 1
                 visited_stack = []
 
+                found_ind = 0
+
                 current_trail = []
 
                 while to_visit_stack_len > 0:
-                    print("TO VISIT STACK: ", to_visit_stack)
                     curr_vertex = to_visit_stack.pop()
                     current_trail.append(curr_vertex)
                     if curr_vertex not in history:
-                        history[curr_vertex] = "gray"
+                        history[curr_vertex] = ["gray", found_ind]
 
                     if curr_vertex not in accounted_for:
                         accounted_for[curr_vertex] = True
@@ -393,15 +394,15 @@ class DirectedGraph:
                         # will be pushed first
                         curr_vertex_neighbors = sorted(curr_vertex_neighbors, reverse=True)
 
-                        if not curr_vertex_neighbors:
-                            current_trail.pop()
-
                         for neighbor in curr_vertex_neighbors:
                             # this only runs if the vertex is not a "leaf node"
                             history[curr_vertex] = 'black'
 
                             self.push(neighbor, to_visit_stack)
                             to_visit_stack_len += 1
+
+                        if not neighbor:
+                            current_trail.pop()
 
                     # this is where we check for sink/source node needed for a cycle to exist
                     # elif history[curr_vertex] == 'black':
