@@ -349,32 +349,29 @@ class DirectedGraph:
             black = visited and left from
         """
         accounted_for = {}
+        children = {}
+        parents = {}
 
         # DFS counter, only call DFS on NEW vertices
         for vertex in range(self.v_count):
 
-            history = {}
-
             if vertex not in accounted_for:
 
-                to_visit_stack = [vertex]
-                to_visit_stack_len = 1
+                to_visit_queue = []
                 visited_stack = []
 
-                found_ind = 0
+                self.enqueue(vertex, to_visit_queue)
+                to_visit_queue_len = 1
 
-                current_trail = []
+                root = vertex
 
-                while to_visit_stack_len > 0:
-                    curr_vertex = to_visit_stack.pop()
-                    current_trail.append(curr_vertex)
-                    if curr_vertex not in history:
-                        history[curr_vertex] = ["gray", found_ind]
+                while to_visit_queue_len > 0:
+                    curr_vertex = self.dequeue(to_visit_queue)
 
-                    if curr_vertex not in accounted_for:
-                        accounted_for[curr_vertex] = True
+                    if root not in children:
+                        children[root] = []
+                    to_visit_queue_len -= 1
 
-                    to_visit_stack_len -= 1
                     # only process non-visited vertices
                     if curr_vertex not in visited_stack:
                         self.push(curr_vertex, visited_stack)
@@ -385,36 +382,29 @@ class DirectedGraph:
                         while col_ind < self.v_count:
                             # process edge existence for each vertex
                             if self.adj_matrix[curr_vertex][col_ind] > 0:
-                                self.push(col_ind, curr_vertex_neighbors)
+                                self.enqueue(col_ind, curr_vertex_neighbors)
 
                             col_ind += 1
-                        # now add all of these to the stack, sort them in descending order
-                        # descending order allows for correct processing of to_visit vertices
-                        # since the lowest values will be pushed last while the higher values
-                        # will be pushed first
-                        curr_vertex_neighbors = sorted(curr_vertex_neighbors, reverse=True)
-
+                        # now add all of these to the stack, sort them in ascending order
+                        # ascending order is good as dequeue will process elements in the
+                        # order they were placed inside the to_visit_queue
+                        curr_vertex_neighbors = sorted(curr_vertex_neighbors)
                         for neighbor in curr_vertex_neighbors:
-                            # this only runs if the vertex is not a "leaf node"
-                            history[curr_vertex] = 'black'
+                            if neighbor not in children[root]:
+                                children[root].append(neighbor)
 
-                            self.push(neighbor, to_visit_stack)
-                            to_visit_stack_len += 1
+                            if neighbor not in parents:
+                                parents[neighbor] = [curr_vertex]
+                            elif curr_vertex not in parents[neighbor]:
+                                parents[neighbor].append(curr_vertex)
+                            self.enqueue(neighbor, to_visit_queue)
+                            to_visit_queue_len += 1
 
-                        if not curr_vertex_neighbors:
-                            current_trail.pop()
-
-                    # this is where we check for sink/source node needed for a cycle to exist
-                    # elif history[curr_vertex] == 'black':
-                    #     return True
-
-                    elif curr_vertex in current_trail and history[curr_vertex] == 'black':
-                        print("FOUND A CYCLE: ", current_trail)
-                        print("HISTORY: ", history)
-                        return True
-
-                print("VISITED: ", visited_stack)
-                print("HISTORY: ", history)
+                    # check to see if we've landed on a vertex that is a child of the parent
+                    if curr_vertex in visited_stack and curr_vertex in children:
+                        # if a vertex is a child of itself, then a cycle exists
+                        if curr_vertex in children[curr_vertex]:
+                            return True
 
         return False
 
