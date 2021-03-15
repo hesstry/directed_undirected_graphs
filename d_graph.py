@@ -401,7 +401,7 @@ class DirectedGraph:
                             self.push(neighbor, to_visit_stack)
                             to_visit_stack_len += 1
 
-                        if not neighbor:
+                        if not curr_vertex_neighbors:
                             current_trail.pop()
 
                     # this is where we check for sink/source node needed for a cycle to exist
