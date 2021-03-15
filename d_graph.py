@@ -335,22 +335,14 @@ class DirectedGraph:
             none
 
         functionality:
-            This uses the coloring method as found in https://en.wikipedia.org/wiki/Topological_sorting under
-            the section "Depth-First-Search"
+            This exploits the fact that whenever a vertex is a child of itself, a cycle exists. Using BFS,
+            a dictionary keeps track of each nodes children, and then whenever a vertex is revisited, it checks
+            to see if it is a child of itself.
 
-            If we have a potential back-edge, then we check to see if this edge is pointing to a node or vertex
-            that is both a sink and a source, if it points to a node that is only a sink, then we've found a leaf
-            in the graph, and this tells us nothing about the cyclic-nature of the graph
-
-            A back-edge occurs when the repeated node is both a source and a sink, indicating that a path exists from
-            this node to itself
-
-            gray = visited
-            black = visited and left from
+            This is done for all unique connected components in the graph.
         """
         accounted_for = {}
         children = {}
-        parents = {}
 
         # DFS counter, only call DFS on NEW vertices
         for vertex in range(self.v_count):
@@ -393,10 +385,6 @@ class DirectedGraph:
                             if neighbor not in children[root]:
                                 children[root].append(neighbor)
 
-                            if neighbor not in parents:
-                                parents[neighbor] = [curr_vertex]
-                            elif curr_vertex not in parents[neighbor]:
-                                parents[neighbor].append(curr_vertex)
                             self.enqueue(neighbor, to_visit_queue)
                             to_visit_queue_len += 1
 
@@ -412,15 +400,90 @@ class DirectedGraph:
     def dijkstra(self, src: int) -> []:
         """
         parameters:
-
+            src(int): the starting vertex to check paths from
 
         returns:
+            list containing distances from src to respective vertices
 
+            each vertex is the same value as its index in the list
+
+            ex: if src = vertex 3, and distance from src to vertex 0 = 2 then list[0] = 2, list[3] = 0
 
         functionality:
 
         """
-        pass
+
+        children = {}
+
+        distances = {}
+
+        to_visit_queue = []
+        visited_stack = []
+
+        self.enqueue(src, to_visit_queue)
+        to_visit_queue_len = 1
+
+        while to_visit_queue_len > 0:
+            curr_vertex = self.dequeue(to_visit_queue)
+
+            if src not in children:
+                children[src] = []
+
+            to_visit_queue_len -= 1
+
+            # only process non-visited vertices
+            if curr_vertex not in visited_stack:
+                self.push(curr_vertex, visited_stack)
+
+                curr_vertex_neighbors = []
+                col_ind = 0
+                # find all vertices that curr_vertex is connected to
+                while col_ind < self.v_count:
+                    # process edge existence for each vertex
+                    if self.adj_matrix[curr_vertex][col_ind] > 0:
+                        self.enqueue(col_ind, curr_vertex_neighbors)
+
+                    col_ind += 1
+                # now add all of these to the stack, sort them in ascending order
+                # ascending order is good as dequeue will process elements in the
+                # order they were placed inside the to_visit_queue
+                curr_vertex_neighbors = sorted(curr_vertex_neighbors)
+                for neighbor in curr_vertex_neighbors:
+                    if neighbor not in children[src]:
+                        children[src].append(neighbor)
+
+                    # if a path from src to neighbor exists, and a path from neighbor to some other vertex exists,
+                    # then a path from src to that other vertex exists, and we can do
+                    # distance from src to other vertex = distance from src to neighbor + distance from neighbor to other vertex
+                    if curr_vertex == src:
+                        distances[(src, neighbor)] = self.adj_matrix[src][neighbor]
+
+                    if curr_vertex != src and (curr_vertex, neighbor) not in distances:
+                        distances[(curr_vertex, neighbor)] = self.adj_matrix[curr_vertex][neighbor]
+
+                    if (src, neighbor) not in distances:
+                        distances[(src, neighbor)] = distances[(src, curr_vertex)] + distances[(curr_vertex, neighbor)]
+
+                    self.enqueue(neighbor, to_visit_queue)
+                    to_visit_queue_len += 1
+
+        calculated_distances = [None]*self.v_count
+
+        path_ind = 0
+        while path_ind < self.v_count:
+            if path_ind == src:
+                calculated_distances[path_ind] = 0
+
+            elif (src, path_ind) not in distances:
+                calculated_distances[path_ind] = float('inf')
+            else:
+                calculated_distances[path_ind] = distances[(src, path_ind)]
+            path_ind += 1
+
+        print(calculated_distances)
+        print(self)
+
+
 
 
 if __name__ == '__main__':
@@ -471,32 +534,32 @@ if __name__ == '__main__':
     #     print(f'{start} DFS:{g.dfs(start)} BFS:{g.bfs(start)}')
     #
     #
-    print("\nPDF - method has_cycle() example 1")
-    print("----------------------------------")
-    edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
-             (3, 1, 5), (2, 1, 23), (3, 2, 7)]
-    g = DirectedGraph(edges)
-
-    edges_to_remove = [(3, 1), (4, 0), (3, 2)]
-    for src, dst in edges_to_remove:
-        g.remove_edge(src, dst)
-        print(g.get_edges(), g.has_cycle(), sep='\n')
-
-    edges_to_add = [(4, 3), (2, 3), (1, 3), (4, 0)]
-    for src, dst in edges_to_add:
-        g.add_edge(src, dst)
-        print(g.get_edges(), g.has_cycle(), sep='\n')
-    print('\n', g)
-    #
-    #
-    # print("\nPDF - dijkstra() example 1")
-    # print("--------------------------")
+    # print("\nPDF - method has_cycle() example 1")
+    # print("----------------------------------")
     # edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
     #          (3, 1, 5), (2, 1, 23), (3, 2, 7)]
     # g = DirectedGraph(edges)
-    # for i in range(5):
-    #     print(f'DIJKSTRA {i} {g.dijkstra(i)}')
-    # g.remove_edge(4, 3)
+    #
+    # edges_to_remove = [(3, 1), (4, 0), (3, 2)]
+    # for src, dst in edges_to_remove:
+    #     g.remove_edge(src, dst)
+    #     print(g.get_edges(), g.has_cycle(), sep='\n')
+    #
+    # edges_to_add = [(4, 3), (2, 3), (1, 3), (4, 0)]
+    # for src, dst in edges_to_add:
+    #     g.add_edge(src, dst)
+    #     print(g.get_edges(), g.has_cycle(), sep='\n')
     # print('\n', g)
-    # for i in range(5):
-    #     print(f'DIJKSTRA {i} {g.dijkstra(i)}')
+    #
+    #
+    print("\nPDF - dijkstra() example 1")
+    print("--------------------------")
+    edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
+             (3, 1, 5), (2, 1, 23), (3, 2, 7)]
+    g = DirectedGraph(edges)
+    for i in range(5):
+        print(f'DIJKSTRA {i} {g.dijkstra(i)}')
+    g.remove_edge(4, 3)
+    print('\n', g)
+    for i in range(5):
+        print(f'DIJKSTRA {i} {g.dijkstra(i)}')
