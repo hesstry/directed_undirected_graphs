@@ -4,7 +4,7 @@
 # Description:
 
 import heapq
-from collections import OrderedDict
+from collections import deque
 
 class DirectedGraph:
     """
@@ -412,89 +412,46 @@ class DirectedGraph:
             ex: if src = vertex 3, and distance from src to vertex 0 = 2 then list[0] = 2, list[3] = 0
 
         functionality:
+            Uses a hash map and a priority queue to find the paths from src to all other vertices in the graph
 
+            Returns these paths
         """
 
-        children = {}
+        visited = {}
+        calculated = [None]*self.v_count
 
-        distances = {}
+        to_visit_priority_queue = []
 
-        distances[(src, src)] = 0
+        heapq.heappush(to_visit_priority_queue,(0, src))
 
-        to_visit_queue = []
-        visited_stack = []
+        while len(to_visit_priority_queue) > 0:
+            dist_src_vertex = heapq.heappop(to_visit_priority_queue)
+            curr_vertex = dist_src_vertex[1]
+            dist_from_src = dist_src_vertex[0]
 
-        self.enqueue(src, to_visit_queue)
-        to_visit_queue_len = 1
+            if curr_vertex not in visited:
+                visited[curr_vertex] = dist_from_src
 
-        while to_visit_queue_len > 0:
-            curr_vertex = self.dequeue(to_visit_queue)
-
-            if src not in children:
-                children[src] = []
-
-            to_visit_queue_len -= 1
-
-            # only process non-visited vertices
-            if curr_vertex not in visited_stack:
-                self.push(curr_vertex, visited_stack)
-
-                curr_vertex_neighbors = []
                 col_ind = 0
-                # find all vertices that curr_vertex is connected to
                 while col_ind < self.v_count:
-                    # process edge existence for each vertex
-                    if self.adj_matrix[curr_vertex][col_ind] > 0:
-                        self.enqueue(col_ind, curr_vertex_neighbors)
+                    distance = self.adj_matrix[curr_vertex][col_ind]
+                    if distance > 0:
+                        neighbor = col_ind
+                        src_to_neighbor = dist_from_src + distance
+                        heapq.heappush(to_visit_priority_queue, (src_to_neighbor, neighbor))
 
                     col_ind += 1
-                # now add all of these to the stack, sort them in ascending order
-                # ascending order is good as dequeue will process elements in the
-                # order they were placed inside the to_visit_queue
-                curr_vertex_neighbors = sorted(curr_vertex_neighbors)
-                for neighbor in curr_vertex_neighbors:
-                    if neighbor not in children[src]:
-                        children[src].append(neighbor)
 
-                    # if a path from src to neighbor exists, and a path from neighbor to some other vertex exists,
-                    # then a path from src to that other vertex exists, and we can do
-                    # distance from src to other vertex = distance from src to neighbor + distance from neighbor to other vertex
-                    if curr_vertex == src:
-                        distances[(src, neighbor)] = self.adj_matrix[src][neighbor]
 
-                    # if this is the first time we've encountered this pair, go ahead and add it
-                    elif (curr_vertex, neighbor) not in distances:
-                        distances[(curr_vertex, neighbor)] = self.adj_matrix[curr_vertex][neighbor]
+        for vertex in range(self.v_count):
 
-                    if (src, curr_vertex) in distances:
-                        curr_path_distance = distances[(src, curr_vertex)] + self.adj_matrix[curr_vertex][neighbor]
-                        print("CURRENT PATH DISTANCE: ", curr_path_distance, "FROM {} TO {}".format(src, neighbor))
+            if vertex not in visited:
+                calculated[vertex] = float('inf')
 
-                        if (src, neighbor) in distances:
-                            distances[(src, neighbor)] = min(distances[(src, neighbor)], curr_path_distance)
-
-                        else:
-                            distances[(src, neighbor)] = curr_path_distance
-
-                        print("SAVED PATH DISTANCE: ", distances[(src, neighbor)])
-
-                    self.enqueue(neighbor, to_visit_queue)
-                    to_visit_queue_len += 1
-
-        calculated_distances = [None] * self.v_count
-
-        path_ind = 0
-        while path_ind < self.v_count:
-            if path_ind == src:
-                calculated_distances[path_ind] = 0
-
-            elif (src, path_ind) not in distances:
-                calculated_distances[path_ind] = float('inf')
             else:
-                calculated_distances[path_ind] = distances[(src, path_ind)]
-            path_ind += 1
+                calculated[vertex] = visited[vertex]
 
-        return calculated_distances
+        return calculated
 
 
 if __name__ == '__main__':
