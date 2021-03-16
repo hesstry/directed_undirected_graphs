@@ -468,6 +468,7 @@ class DirectedGraph:
 
                     if (src, curr_vertex) in distances:
                         curr_path_distance = distances[(src, curr_vertex)] + self.adj_matrix[curr_vertex][neighbor]
+                        print("CURRENT PATH DISTANCE: ", curr_path_distance, "FROM {} TO {}".format(src, neighbor))
 
                         if (src, neighbor) in distances:
                             distances[(src, neighbor)] = min(distances[(src, neighbor)], curr_path_distance)
@@ -475,10 +476,10 @@ class DirectedGraph:
                         else:
                             distances[(src, neighbor)] = curr_path_distance
 
+                        print("SAVED PATH DISTANCE: ", distances[(src, neighbor)])
+
                     self.enqueue(neighbor, to_visit_queue)
                     to_visit_queue_len += 1
-
-        print(distances)
 
         calculated_distances = [None] * self.v_count
 
